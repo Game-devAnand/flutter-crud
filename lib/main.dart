@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dataTest.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'add_and_edit_page.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -48,7 +49,7 @@ class AppBarWeb extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(left: 8.0,top: 5.0),
+                    padding: EdgeInsets.only(left: 8.0, top: 5.0),
                     child: Icon(Icons.account_balance_sharp, size: 34),
                   ),
                   Row(
@@ -102,7 +103,7 @@ class _AppBodyHomeState extends State<AppBodyHome> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:[
+                    children: [
                       const Text(
                         "Books",
                         style: TextStyle(
@@ -115,7 +116,14 @@ class _AppBodyHomeState extends State<AppBodyHome> {
                           color: Colors.black,
                           child: Center(
                             child: TextButton(
-                              onPressed:(){},
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AddBook();
+                                  },
+                                );
+                              },
                               child: const Text(
                                 "Add",
                                 style: TextStyle(
@@ -129,22 +137,26 @@ class _AppBodyHomeState extends State<AppBodyHome> {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child:Container(
-                      color: Colors.white38,
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          icon: Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Icon(Icons.search, color: Colors.black,size: 20,),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: Colors.white38,
+                        child: const TextField(
+                          decoration: InputDecoration(
+                            icon: Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Icon(
+                                Icons.search,
+                                color: Colors.black,
+                                size: 20,
+                              ),
+                            ),
+                            hintText: 'Search',
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10.0),
+                            border: InputBorder.none,
                           ),
-                          hintText: 'Search',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
-                          border: InputBorder.none,
                         ),
-                      ),
-                    )
-                  ),
+                      )),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: const [
@@ -160,7 +172,7 @@ class _AppBodyHomeState extends State<AppBodyHome> {
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height - 270,
-            child: HomePageList(),
+            child: const HomePageList(),
           )
         ],
       ),
@@ -182,15 +194,38 @@ class _HomePageListState extends State<HomePageList> {
     return Card(
       child: ListView.builder(
           itemCount: demo.length,
-          itemBuilder: (context,index) {
+          itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children:[
+                children: [
                   Text("${demo[index].title}"),
                   Text("${demo[index].author}"),
                   Text("${demo[index].status}"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        splashRadius: 15,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return UpdateBookPage(id: "1234");
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.edit, color: Colors.black),
+                      ),
+                      const SizedBox.square(dimension: 10),
+                      IconButton(
+                        splashRadius: 15,
+                        onPressed: () {},
+                        icon: const Icon(Icons.delete, color: Colors.black),
+                      ),
+                    ],
+                  )
                 ],
               ),
             );

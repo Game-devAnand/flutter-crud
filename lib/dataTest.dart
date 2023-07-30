@@ -2,9 +2,22 @@ class DataTestModel {
   String title = "";
   String author = "";
   String status = "";
-  late String check_out;
+  String check_out = "dd/mm/yy";
 
   DataTestModel(this.title,this.author,this.status);
+
+  DataTestModel.fromJson(Map<String , dynamic> json)
+    :title = json['title'],
+    author = json['author'],
+    check_out = json['check_out'],
+    status = json['status'];
+
+  Map<String,dynamic> toJson()=>{
+    'title' : title,
+    'author' : author,
+    'status' : status,
+    'check_out' : check_out,
+  };
 
 }
 
