@@ -1,16 +1,31 @@
-class DataTestModel {
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+class DataModel {
   String title = "";
   String author = "";
   String status = "";
   String check_out = "dd/mm/yy";
 
-  DataTestModel(this.title,this.author,this.status);
+  DataModel({required this.title,required this.author,required this.status ,required this.check_out});
 
-  DataTestModel.fromJson(Map<String , dynamic> json)
+  DataModel.fromJson(Map<String , dynamic> json)
     :title = json['title'],
     author = json['author'],
     check_out = json['check_out'],
     status = json['status'];
+
+  factory DataModel.fromSnapshot(DocumentSnapshot snapshot) {
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+    return DataModel(
+        title : data['title'],
+        author : data['author'],
+        check_out : data['check_out'],
+        status : data['status']
+    );
+  }
+
 
   Map<String,dynamic> toJson()=>{
     'title' : title,
@@ -21,11 +36,43 @@ class DataTestModel {
 
 }
 
-List<DataTestModel> testData = [
-  DataTestModel("book1", "author1", "available"),
-  DataTestModel("book2", "author2", "available"),
-  DataTestModel("book3", "author3", "not available"),
-  DataTestModel("book4", "author4", "available"),
-  DataTestModel("book5", "author5", "not available"),
-  DataTestModel("book6", "author6", "available"),
+List<DataModel> testData = [
+  // DataModel("book1", "author1", "available"),
+  // DataModel("book2", "author2", "available"),
+  // DataModel("book3", "author3", "not available"),
+  // DataModel("book4", "author4", "available"),
+  // DataModel("book5", "author5", "not available"),
+  // DataModel("book6", "author6", "available"),
 ];
+
+
+final CollectionReference booksCollection =
+FirebaseFirestore.instance.collection('Books');
+
+Future<void> addBookFireBase(DataModel book) async {
+  final CollectionReference booksCollection =
+  FirebaseFirestore.instance.collection('Books');
+  await booksCollection.add(book.toJson());
+}
+
+Stream<QuerySnapshot> getBookFireBase() {
+  final CollectionReference booksCollection =
+  FirebaseFirestore.instance.collection('Books');
+  return booksCollection.snapshots();
+}
+
+Stream<List<DataModel>> fetchBooks(String searchTerm) {
+  return FirebaseFirestore.instance
+      .collection('Books')
+      .where('title', isGreaterThanOrEqualTo: searchTerm)
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    List<DataModel> bookList = [];
+
+    querySnapshot.docs.forEach((doc) {
+      DataModel book = DataModel.fromSnapshot(doc);
+      bookList.add(book);
+    });
+    return bookList;
+  });
+}

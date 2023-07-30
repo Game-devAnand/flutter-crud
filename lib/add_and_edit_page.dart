@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dataTest.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 class AddBook extends StatefulWidget {
@@ -49,19 +48,13 @@ class _AddBookState extends State<AddBook> {
         ),
         ElevatedButton(
           onPressed: () {
-            // Add your code here to handle the data input by the user
-            String title = titleController.text;
-            String author = authorController.text;
-            String checkout = checkoutController.text;
-            String status = statusController.text;
-
-            // For example, you can print the values
-            // print('Title: $title');
-            // print('Author: $author');
-            // print('Check-out: $checkout');
-            // print('Status: $status');
-
-            // Close the alert box
+            if(titleController.text == "" && authorController.text == ""){
+              print(">>>>>> NO input");
+            }
+            else{
+              DataModel fbBook = DataModel(title: titleController.text, author: authorController.text, status: statusController.text, check_out: 'dd/mm/yy');
+              addBookFireBase(fbBook);
+            }
             Navigator.of(context).pop();
           },
           style: ElevatedButton.styleFrom(

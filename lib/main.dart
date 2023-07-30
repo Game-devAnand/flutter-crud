@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'add_and_edit_page.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -152,7 +153,7 @@ class _AppBodyHomeState extends State<AppBodyHome> {
                             ),
                             hintText: 'Search',
                             contentPadding:
-                                EdgeInsets.symmetric(horizontal: 10.0),
+                            EdgeInsets.symmetric(horizontal: 10.0),
                             border: InputBorder.none,
                           ),
                         ),
@@ -171,7 +172,10 @@ class _AppBodyHomeState extends State<AppBodyHome> {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height - 270,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height - 270,
             child: const HomePageList(),
           )
         ],
@@ -186,50 +190,69 @@ class HomePageList extends StatefulWidget {
   @override
   State<HomePageList> createState() => _HomePageListState();
 }
-
+//TODO:LIST VIEW
 class _HomePageListState extends State<HomePageList> {
   @override
   Widget build(BuildContext context) {
-    List demo = testData;
+    TextEditingController searchController = TextEditingController();
     return Card(
-      child: ListView.builder(
-          itemCount: demo.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("${demo[index].title}"),
-                  Text("${demo[index].author}"),
-                  Text("${demo[index].status}"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        splashRadius: 15,
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return UpdateBookPage(id: "1234");
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.edit, color: Colors.black),
-                      ),
-                      const SizedBox.square(dimension: 10),
-                      IconButton(
-                        splashRadius: 15,
-                        onPressed: () {},
-                        icon: const Icon(Icons.delete, color: Colors.black),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            );
-          }),
+      child: StreamBuilder<List<DataModel>>(
+        stream: fetchBooks(searchController.text),
+        builder: (BuildContext context, AsyncSnapshot<List<DataModel>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Text('No books found');
+          }
+
+          List<DataModel> bookList = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: bookList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(" ${bookList[index].title}"),
+                    Text(" ${bookList[index].author}"),
+                    Text(" ${bookList[index].status}"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          splashRadius: 15,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return UpdateBookPage(id: "1234");
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.edit, color: Colors.black),
+                        ),
+                        const SizedBox.square(dimension: 10),
+                        IconButton(
+                          splashRadius: 15,
+                          onPressed: () {
+                            //print("id is :${bookList[index]}");
+                          },
+                          icon: const Icon(Icons.delete, color: Colors.black),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },);
+        },
+      ),
     );
   }
 }
