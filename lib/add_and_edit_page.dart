@@ -138,13 +138,11 @@ class _UpdateBookPageState extends State<UpdateBookPage> {
         ),
         ElevatedButton(
           onPressed: () {
-            // Add your code here to handle the data input by the user
-            String title = titleController.text;
-            String author = authorController.text;
-            String checkout = checkoutController.text;
-            String status = statusController.text;
-
-            // Close the alert box
+            dataObj.title = titleController.text;
+            dataObj.author = authorController.text;
+            dataObj.status = statusController.text;
+            dataObj.check_out = checkoutController.text;
+            updateBook(dataObj);
             Navigator.of(context).pop();
           },
           style: ElevatedButton.styleFrom(

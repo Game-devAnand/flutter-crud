@@ -89,3 +89,9 @@ Future<void> deleteBook(String id)async {
   final CollectionReference booksCollection = FirebaseFirestore.instance.collection('Books');
   await booksCollection.doc(id).delete();
 }
+
+Future<void> updateBook(DataModel data)async {
+  final CollectionReference booksCollection = FirebaseFirestore.instance.collection('Books');
+  await booksCollection.doc(data.ID).update(data.toJson());
+  print("Updated");
+}
