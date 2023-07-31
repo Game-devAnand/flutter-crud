@@ -192,6 +192,7 @@ class HomePageList extends StatefulWidget {
 }
 //TODO:LIST VIEW
 class _HomePageListState extends State<HomePageList> {
+  String id = "";
   @override
   Widget build(BuildContext context) {
     TextEditingController searchController = TextEditingController();
@@ -228,10 +229,11 @@ class _HomePageListState extends State<HomePageList> {
                         IconButton(
                           splashRadius: 15,
                           onPressed: () {
+                            DataModel dataObj = bookList[index];
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return UpdateBookPage(id: "1234");
+                                return UpdateBookPage(dataObj: bookList[index]);
                               },
                             );
                           },
@@ -241,7 +243,8 @@ class _HomePageListState extends State<HomePageList> {
                         IconButton(
                           splashRadius: 15,
                           onPressed: () {
-                            //print("id is :${bookList[index]}");
+                            print("id is :${bookList[index].ID}");
+                            deleteBook(bookList[index].ID);
                           },
                           icon: const Icon(Icons.delete, color: Colors.black),
                         ),

@@ -1,20 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/intl.dart';
+
+String generateUniqueBookId() {
+  int timestamp = DateTime.now().microsecondsSinceEpoch;
+  String bookId = timestamp.toString();
+  return bookId;
+}
 
 class DataModel {
   String title = "";
   String author = "";
   String status = "";
   String check_out = "dd/mm/yy";
+  String ID = "";
 
-  DataModel({required this.title,required this.author,required this.status ,required this.check_out});
+  DataModel({required this.title,required this.author,required this.status ,required this.check_out, required this.ID});
 
   DataModel.fromJson(Map<String , dynamic> json)
     :title = json['title'],
     author = json['author'],
     check_out = json['check_out'],
-    status = json['status'];
+    status = json['status'],
+    ID = json['id'];
 
   factory DataModel.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
@@ -22,7 +31,8 @@ class DataModel {
         title : data['title'],
         author : data['author'],
         check_out : data['check_out'],
-        status : data['status']
+        status : data['status'],
+        ID : data['id'],
     );
   }
 
@@ -32,35 +42,30 @@ class DataModel {
     'author' : author,
     'status' : status,
     'check_out' : check_out,
+    'id' : ID,
   };
 
 }
-
-List<DataModel> testData = [
-  // DataModel("book1", "author1", "available"),
-  // DataModel("book2", "author2", "available"),
-  // DataModel("book3", "author3", "not available"),
-  // DataModel("book4", "author4", "available"),
-  // DataModel("book5", "author5", "not available"),
-  // DataModel("book6", "author6", "available"),
-];
 
 
 final CollectionReference booksCollection =
 FirebaseFirestore.instance.collection('Books');
 
 Future<void> addBookFireBase(DataModel book) async {
-  final CollectionReference booksCollection =
-  FirebaseFirestore.instance.collection('Books');
-  await booksCollection.add(book.toJson());
+  print("book id is ${book.ID}");
+  final CollectionReference booksCollection = FirebaseFirestore.instance.collection('Books');
+  await booksCollection.doc(book.ID).set(book.toJson());
 }
 
+
+
+//getting
 Stream<QuerySnapshot> getBookFireBase() {
   final CollectionReference booksCollection =
   FirebaseFirestore.instance.collection('Books');
   return booksCollection.snapshots();
 }
-
+//listening
 Stream<List<DataModel>> fetchBooks(String searchTerm) {
   return FirebaseFirestore.instance
       .collection('Books')
@@ -75,4 +80,12 @@ Stream<List<DataModel>> fetchBooks(String searchTerm) {
     });
     return bookList;
   });
+}
+
+
+//delete
+
+Future<void> deleteBook(String id)async {
+  final CollectionReference booksCollection = FirebaseFirestore.instance.collection('Books');
+  await booksCollection.doc(id).delete();
 }

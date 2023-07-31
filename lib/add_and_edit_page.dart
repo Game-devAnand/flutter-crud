@@ -15,6 +15,8 @@ class _AddBookState extends State<AddBook> {
 
   @override
   Widget build(BuildContext context) {
+    String idNo = generateUniqueBookId();
+    print("new id ${idNo}");
     return AlertDialog(
       title: const Text('Add Book'),
       content: SingleChildScrollView(
@@ -52,7 +54,7 @@ class _AddBookState extends State<AddBook> {
               print(">>>>>> NO input");
             }
             else{
-              DataModel fbBook = DataModel(title: titleController.text, author: authorController.text, status: statusController.text, check_out: 'dd/mm/yy');
+              DataModel fbBook = DataModel(title: titleController.text, author: authorController.text, status: statusController.text, check_out: 'dd/mm/yy', ID: idNo);
               addBookFireBase(fbBook);
             }
             Navigator.of(context).pop();
@@ -70,15 +72,36 @@ class _AddBookState extends State<AddBook> {
 
 
 //update book window
-class UpdateBookPage extends StatelessWidget {
-  String id = "";
-  UpdateBookPage({Key? key,required this.id}) : super(key: key);
+class UpdateBookPage extends StatefulWidget {
+  DataModel dataObj;
+  UpdateBookPage({Key? key,required this.dataObj}) : super(key: key);
 
+  @override
+  State<UpdateBookPage> createState() => _UpdateBookPageState(dataObj);
+}
+
+class _UpdateBookPageState extends State<UpdateBookPage> {
+  late DataModel dataObj;
   TextEditingController titleController = TextEditingController();
+
   TextEditingController authorController = TextEditingController();
+
   TextEditingController checkoutController = TextEditingController();
+
   TextEditingController statusController = TextEditingController();
 
+  _UpdateBookPageState(this.dataObj);
+
+  @override
+  void initState() {
+    titleController.text = dataObj.title;
+    authorController.text = dataObj.author;
+    checkoutController.text = dataObj.check_out;
+    statusController.text = dataObj.status;
+    super.initState();
+  }
+
+  //titleController
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -86,7 +109,7 @@ class UpdateBookPage extends StatelessWidget {
       content: SingleChildScrollView(
         child: Column(
           children: [
-            Text('id #$id'),
+            Text('id #${widget.dataObj.ID}'),
             TextField(
               controller: titleController,
               decoration: const InputDecoration(labelText: 'Title'),
